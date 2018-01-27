@@ -1,5 +1,6 @@
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
+#include "Characters.h"
 
 USING_NS_CC;
 
@@ -95,16 +96,18 @@ bool HelloWorld::init()
     }
 
 	// add gunner A
-	auto gunner1 = Sprite::create("characters/brownfellow_right.PNG");
+	auto gunner1 = new MainRole();
 	if (gunner1 == nullptr)
 	{
 		problemLoading("brownfellow_right.PNG");
 	}
 	else
 	{
+		gunner1->autorelease();
 		gunner1->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 		this->addChild(gunner1, 1);
 	}
+
     return true;
 }
 
