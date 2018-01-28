@@ -106,8 +106,9 @@ bool HelloWorld::init()
 		gunner1->autorelease();
 		gunner1->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
 		this->addChild(gunner1, 1);
+		gunner1->scheduleUpdate();
 	}
-
+	//this->scheduleUpdate();
     return true;
 }
 
