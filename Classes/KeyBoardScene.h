@@ -1,26 +1,29 @@
-#ifndef __TEST_SCENE_H__
-#define __TEST_SCENE_H__
+#pragma once
 
 #include "cocos2d.h"
+#include <map>
 
-USING_NS_CC;
-
-class KeyBoardScene : public cocos2d::Scene
+class KeyboardScene : public cocos2d::Layer
 {
 public:
-	static cocos2d::Scene* createScene();
 
+	static cocos2d::Scene* createScene();
 	virtual bool init();
 
-	void onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event);
-	void onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event);
+	bool isKeyPressed(cocos2d::EventKeyboard::KeyCode);
+	bool areKeysPressed(std::vector<cocos2d::EventKeyboard::KeyCode>);
+	int keyPressedDuration(cocos2d::EventKeyboard::KeyCode);
 
-	// implement the "static create()" method manually
-	CREATE_FUNC(KeyBoardScene);
+	CREATE_FUNC(KeyboardScene);
 
 private:
-	cocos2d::Label* label;
+	static std::map<cocos2d::EventKeyboard::KeyCode,
+				    std::chrono::high_resolution_clock::time_point> keys;
+	cocos2d::Label * label;
+	cocos2d::Sprite *gunnerMiami;
+	int interval;//Interval between the sprite move one pixel.As reciprocal of the velocity.
+	std::vector<cocos2d::EventKeyboard::KeyCode> moveControlKeys;
 
+public:
+	virtual void update(float delta) override;
 };
-
-#endif // __TEST_SCENE_H__
