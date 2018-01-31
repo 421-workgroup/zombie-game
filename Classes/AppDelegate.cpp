@@ -62,10 +62,9 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 	// create a scene. it's an autorelease object
 	auto scene = HelloWorld::createScene();
-	auto keyboard_scene = KeyboardScene::createScene();
 
 	// run
-	director->runWithScene(keyboard_scene);
+	director->runWithScene(scene);
 
 	return true;
 }

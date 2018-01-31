@@ -79,3 +79,17 @@ public:
 
 	}
 };
+
+class Zombie : public Sprite {
+private:
+	const std::string zombie_image_path = "characters/zombie.PNG";
+public:
+	enum Type {
+		NORMAL_ZOMBIE,
+	};
+
+	Zombie() {
+		initWithFile(zombie_image_path);
+	}
+
+};
