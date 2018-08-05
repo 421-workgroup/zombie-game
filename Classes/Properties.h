@@ -6,9 +6,9 @@ USING_NS_CC;
 
 class PropertiesBundle{
 public:
-	float speed;
+	int speed;
 	int hitBoxRadius;
-	float atk;
+	int atk; // drop atk per second
 	int max_blood;
 };
 

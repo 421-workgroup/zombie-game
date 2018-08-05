@@ -10,6 +10,7 @@ USING_NS_CC;
 class RoleBase : public Sprite
 {
 public:
+	int getHitBoxRadius();
 
 protected:
 	// An attribute of one kind of role. Might change during the game.
@@ -28,25 +29,7 @@ protected:
 		//v_x = v * cos(theta); v_y = v * sin(theta)
 	}velocity;
 
-	void updatePosition(float delta) {
-		if (velocity.v != 0) {
-			loc = getPosition();
-
-			loc.x += velocity.v * cos(velocity.theta) *delta;
-			if (loc.x < 0)
-				loc.x = 0;
-			if (loc.x > Director::getInstance()->getVisibleSize().width)
-				loc.x = Director::getInstance()->getVisibleSize().width;
-
-			loc.y += velocity.v * sin(velocity.theta) *delta;
-			if (loc.y < 0)
-				loc.y = 0;
-			if (loc.y > Director::getInstance()->getVisibleSize().height)
-				loc.y = Director::getInstance()->getVisibleSize().height;
-
-			setPosition(loc);
-		}
-	}
+	void updatePosition(float delta);
 
 private:
 	Vec2 loc;
@@ -63,16 +46,12 @@ public:
 		gunnerList.push_back(this);
 	}
 
-	static std::vector<GunnerBase*> getGunnerList() {
-		return gunnerList;
-	}
+	static std::vector<GunnerBase*> getGunnerList();
 
 	std::vector<ZombieBase*> getHitZombieList();
-	std::vector<GunnerBase*> getHitGunnerList();
+	//std::vector<GunnerBase*> getHitGunnerList();
 
-	int dropBlood() {
-		// Detect hitBox collapse.
-	}
+	int updateBlood(std::vector<ZombieBase*> hitZombieList, float delta);
 
 private:
 	static std::vector<GunnerBase*> gunnerList;
@@ -89,7 +68,7 @@ public:
 		gunner->setPosition(Vec2::ZERO);
 		addChild(gunner, 0, "gunner");
 		auto bloodbar = BloodBar::create(max_blood_init);
-		addChild(bloodbar, 0, "bloodbar");
+		addChild(bloodbar, 0, "bloodBar");
 		bloodbar->setPosition(Vec2(0, this->getChildByName("gunner")->getContentSize().height));
 		// Add a keyboard listener.
 		// This listener is for changing the role's direction and position.
@@ -105,8 +84,8 @@ public:
 	void update(float delta) override {
 		updatePosition(delta);
 
-		BloodBar* bloodbar_ = dynamic_cast<BloodBar*>(getChildByName("bloodbar"));
-		//bloodbar_->updateBlood(50);
+		updateBlood(getHitZombieList(), delta);
+		BloodBar* bloodbar_ = dynamic_cast<BloodBar*>(getChildByName("bloodBar"));
 		bloodbar_->drawBlood();
 	}
 
@@ -115,110 +94,10 @@ private:
 	enum { UP, DOWN, LEFT, RIGHT };
 
 	// Change CurrentTarget->velocity when keyboard statu changed.
-	static void onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {
-		auto mrole = dynamic_cast<MainRole*>(event->getCurrentTarget());
-		switch (keyCode) {
-		case EventKeyboard::KeyCode::KEY_UP_ARROW:
-		case EventKeyboard::KeyCode::KEY_W:
-			mrole->isPressed[UP] = true;
-			break;
-		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-		case EventKeyboard::KeyCode::KEY_S:
-			mrole->isPressed[DOWN] = true;
-			break;
-		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-		case EventKeyboard::KeyCode::KEY_A:
-			mrole->isPressed[LEFT] = true;
-			break;
-		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-		case EventKeyboard::KeyCode::KEY_D:
-			mrole->isPressed[RIGHT] = true;
-			break;
-		}
-		mrole->velocity = getVelocity(mrole->isPressed, mrole->speed);
-	}
-	static void onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event) {
-		auto mrole = dynamic_cast<MainRole*>(event->getCurrentTarget());
-		switch (keyCode) {
-		case EventKeyboard::KeyCode::KEY_UP_ARROW:
-		case EventKeyboard::KeyCode::KEY_W:
-			mrole->isPressed[UP] = false;
-			break;
-		case EventKeyboard::KeyCode::KEY_DOWN_ARROW:
-		case EventKeyboard::KeyCode::KEY_S:
-			mrole->isPressed[DOWN] = false;
-			break;
-		case EventKeyboard::KeyCode::KEY_LEFT_ARROW:
-		case EventKeyboard::KeyCode::KEY_A:
-			mrole->isPressed[LEFT] = false;
-			break;
-		case EventKeyboard::KeyCode::KEY_RIGHT_ARROW:
-		case EventKeyboard::KeyCode::KEY_D:
-			mrole->isPressed[RIGHT] = false;
-			break;
-		}
-		mrole->velocity = getVelocity(mrole->isPressed, mrole->speed);
-	}
+	static void onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event);
+	static void onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event);
 
-	static Velocity getVelocity(bool* isPressed, float speed) {
-		Velocity velocity;
-		velocity.v = speed;
-		int x = 0;// 1 for RIGHT, -1 for LEFT
-		int y = 0;// 1 for UP, -1 for DOWN
-		if (isPressed[UP])
-			y++;
-		if (isPressed[DOWN])
-			y--;
-		if (isPressed[LEFT])
-			x--;
-		if (isPressed[RIGHT])
-			x++;
-
-		switch (x) {
-		case 1:
-			switch (y) {
-			case 1:
-				velocity.theta = M_PI_4;
-				break;
-			case -1:
-				velocity.theta = -M_PI_4;
-				break;
-			case 0:
-				velocity.theta = 0;
-				break;
-			}
-			break;
-		case -1:
-			switch (y) {
-			case 1:
-				velocity.theta = 3 * M_PI_4;
-				break;
-			case -1:
-				velocity.theta = -3 * M_PI_4;
-				break;
-			case 0:
-				velocity.theta = M_PI;
-				break;
-			}
-			break;
-		case 0:
-			switch (y) {
-			case 1:
-				velocity.theta = M_PI_2;
-				break;
-			case -1:
-				velocity.theta = -M_PI_2;
-				break;
-			case 0:
-				velocity.v = 0;
-				velocity.theta = 0;// Not really matter.
-				break;
-			}
-			break;
-		}
-
-		return velocity;
-	}
+	static Velocity getVelocity(bool* isPressed, float speed);
 };
 
 //Base class for all kinds of zombies
@@ -231,29 +110,15 @@ public:
 
 	static std::vector<ZombieBase*> getZombieList();
 
+	float getATK();
+
 protected:
 	float atk;
-	GunnerBase* getNearestGunner(std::vector<GunnerBase*> gunnerList) {
-		float currentDistance, leastDistance = ccpDistance(gunnerList[0]->getPosition(), this->getPosition());
-		GunnerBase* nearestGunner = gunnerList[0];
-		for (auto gunner : gunnerList) {
-			currentDistance = ccpDistance(gunner->getPosition(), getPosition());
-			if (currentDistance < leastDistance) {
-				leastDistance = currentDistance;
-				nearestGunner = gunner;
-			}
-		}
-		return (nearestGunner);
-	}
+	GunnerBase* getNearestGunner(std::vector<GunnerBase*> gunnerList);
 
 private:
 	static std::vector<ZombieBase*> zombieList;
 };
-
-std::vector<ZombieBase*> ZombieBase::getZombieList() {
-	return zombieList;
-}
-
 
 class NormalZombie : public ZombieBase {
 public:
@@ -266,7 +131,7 @@ public:
 		zombie->setPosition(Vec2::ZERO);
 		addChild(zombie, 0, "zombie");
 		auto bloodbar = BloodBar::create(max_blood_init);
-		addChild(bloodbar, 0, "bloodbar");
+		addChild(bloodbar, 0, "bloodBar");
 		bloodbar->setPosition(Vec2(0, this->getChildByName("zombie")->getContentSize().height));
 
 		atk = atk_init;

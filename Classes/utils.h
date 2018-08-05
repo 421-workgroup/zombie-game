@@ -10,8 +10,8 @@ class BloodBar : public Sprite
 */
 {
 private:
-	static const char blood_length = 30;	// the length of blood displayed on screen
-	static const char blood_height =5;		// the height of the blood displayed on screen
+	static const int blood_length = 30;	// the length of blood displayed on screen
+	static const int blood_height =5;		// the height of the blood displayed on screen
 	const Color4F back_color = Color4F(1, 1, 1, 1);
 	const Color4F blood_color = Color4F(1, 0, 0, 1);
 	const Color4F frame_color = Color4F(0.87F, 0.94F, 1, 1);
@@ -19,7 +19,7 @@ private:
 	const Vec2 dest = Vec2(blood_length, blood_height);
 	// `blood`, representing each one's healthy state, is unique to every person or zombie:
 	int max_blood;
-	char blood;
+	int blood;
 	DrawNode* dnode;
 	
 public:
@@ -47,8 +47,12 @@ public:
 	//	dnode->drawRect(origin, blood_dest, frame_color);
 	//}
 
+	int getBlood() {
+		return blood;
+	}
+
 	// 'call back' function to update blood representation
-	void updateBlood(char curr_blood){
+	void setBlood(int curr_blood){
 		blood = curr_blood;
 	}
 
