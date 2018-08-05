@@ -6,10 +6,10 @@ USING_NS_CC;
 
 class PropertiesBundle{
 public:
-	int speed;
+	float speed;
 	int hitBoxRadius;
-	int atk; // drop atk per second
-	int max_blood;
+	float atk; // drop atk per second
+	float max_blood;
 };
 
 class normalZombieProp : public PropertiesBundle {

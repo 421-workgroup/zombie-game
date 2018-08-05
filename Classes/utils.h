@@ -18,15 +18,15 @@ private:
 	const Vec2 origin = Vec2(0, 0);
 	const Vec2 dest = Vec2(blood_length, blood_height);
 	// `blood`, representing each one's healthy state, is unique to every person or zombie:
-	int max_blood;
-	int blood;
+	float max_blood;
+	float blood;
 	DrawNode* dnode;
 	
 public:
 
-	BloodBar(int max_blood_init) : max_blood(max_blood_init), blood(max_blood_init) {};
+	BloodBar(float max_blood_init) : max_blood(max_blood_init), blood(max_blood_init) {};
 
-	static BloodBar* create(int max_blood_init){
+	static BloodBar* create(float max_blood_init){
 		BloodBar* ret = new (std::nothrow) BloodBar(max_blood_init);
 		if (ret && ret->init())
 			ret->autorelease();
@@ -40,6 +40,10 @@ public:
 		return true;
 	}
 
+	void update(float delta) override {
+		drawBlood();
+	}
+
 	//void update(float delta) override {
 	//	auto blood_dest = Vec2(char(blood_length / float(max_blood)*blood), blood_height);
 	//	updateBlood(blood - delta * 1);
@@ -47,12 +51,13 @@ public:
 	//	dnode->drawRect(origin, blood_dest, frame_color);
 	//}
 
-	int getBlood() {
+	float getBlood() {
 		return blood;
 	}
 
 	// 'call back' function to update blood representation
-	void setBlood(int curr_blood){
+	void setBlood(float curr_blood){
+		if (curr_blood < 0) curr_blood = 0;
 		blood = curr_blood;
 	}
 
@@ -64,7 +69,7 @@ public:
 		dnode->setPosition(Vec2::ZERO);
 		this->addChild(dnode, 0 ,"dnode");
 
-		auto blood_dest = Vec2(char(blood_length / float(max_blood)*blood), blood_height);
+		auto blood_dest = Vec2(int(blood_length / max_blood * blood), blood_height);
 		dnode->drawSolidRect(origin, dest, back_color);
 		dnode->drawSolidRect(origin, blood_dest, blood_color);
 		dnode->drawRect(origin, dest, frame_color);

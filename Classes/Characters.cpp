@@ -38,7 +38,7 @@ std::vector<GunnerBase*> GunnerBase::getGunnerList() {
 	return gunnerList;
 }
 std::vector<ZombieBase*> GunnerBase::getHitZombieList() {
-	std::vector<ZombieBase*> hitZombieList;
+	std::vector<ZombieBase*> hitZombieList = {};
 	auto zombieList = ZombieBase::getZombieList();
 	for (auto zombie : zombieList) {
 		auto zombiePositon = zombie->getPosition();
@@ -47,16 +47,14 @@ std::vector<ZombieBase*> GunnerBase::getHitZombieList() {
 	}
 	return hitZombieList;
 }
-int GunnerBase::updateBlood(std::vector<ZombieBase*> hitZombieList, float delta) {
-	int drop = 0;
-	for (auto zombie : hitZombieList)
-		drop += int(zombie->getATK());
+int GunnerBase::updateBlood(float delta) {
+	float drop = 0;
+	for (auto zombie : this->getHitZombieList())
+		drop += zombie->getATK();
 	auto thisBloodBar = dynamic_cast<BloodBar*>(this->getChildByName("bloodBar"));
 	thisBloodBar->setBlood(thisBloodBar->getBlood() - drop * delta);
 	return drop;
 }
-
-
 
 // MainRole
 void MainRole::onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event) {

@@ -51,7 +51,7 @@ public:
 	std::vector<ZombieBase*> getHitZombieList();
 	//std::vector<GunnerBase*> getHitGunnerList();
 
-	int updateBlood(std::vector<ZombieBase*> hitZombieList, float delta);
+	int updateBlood(float delta);
 
 private:
 	static std::vector<GunnerBase*> gunnerList;
@@ -62,7 +62,7 @@ private:
 class MainRole : public GunnerBase {
 public:
 	MainRole(float speed_init = mainRoleProperties.speed, int hitBoxRadius_init = mainRoleProperties.hitBoxRadius,
-		     int max_blood_init = mainRoleProperties.max_blood) {
+		     float max_blood_init = mainRoleProperties.max_blood) {
 		auto gunner = new Gunner();
 		gunner->autorelease();
 		gunner->setPosition(Vec2::ZERO);
@@ -70,6 +70,7 @@ public:
 		auto bloodbar = BloodBar::create(max_blood_init);
 		addChild(bloodbar, 0, "bloodBar");
 		bloodbar->setPosition(Vec2(0, this->getChildByName("gunner")->getContentSize().height));
+		bloodbar->scheduleUpdate();
 		// Add a keyboard listener.
 		// This listener is for changing the role's direction and position.
 		auto eventListener = EventListenerKeyboard::create();
@@ -83,10 +84,7 @@ public:
 
 	void update(float delta) override {
 		updatePosition(delta);
-
-		updateBlood(getHitZombieList(), delta);
-		BloodBar* bloodbar_ = dynamic_cast<BloodBar*>(getChildByName("bloodBar"));
-		bloodbar_->drawBlood();
+		updateBlood(delta);
 	}
 
 private:
