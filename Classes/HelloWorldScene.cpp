@@ -19,23 +19,15 @@ static void problemLoading(const char* filename)
 // on "init" you need to initialize your instance
 bool HelloWorld::init()
 {
-    //////////////////////////////
-    // 1. super init first
+    // super init first
     if ( !Scene::init() )
-    {
         return false;
-    }
 
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    /////////////////////////////
-    // 2. add a menu item with "X" image, which is clicked to quit the program
-    //    you may modify it.
-
-    // add a "close" icon to exit the progress. it's an autorelease object
-    auto closeItem = MenuItemImage::create(
-                                           "CloseNormal.png",
+    // add a menu item which is clicked to quit the program
+    auto closeItem = MenuItemImage::create("CloseNormal.png",
                                            "CloseSelected.png",
 											[&](Ref* sender) {
 												Director::getInstance()->end();
@@ -59,19 +51,17 @@ bool HelloWorld::init()
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
 
-	// add gunner1
-	auto gunner1 = new MainRole();
-	gunner1->speed = 1;
-	if (gunner1 == nullptr)
-	{
-		problemLoading("brownfellow_right.PNG");
+
+	// add playerGunner
+	auto playGunner = new MainRole();
+	if (playGunner == nullptr){
+		problemLoading("PNG file for ");
 	}
-	else
-	{
-		gunner1->autorelease();
-		gunner1->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
-		this->addChild(gunner1, 1);
-		gunner1->scheduleUpdate();
+	else{
+		playGunner->autorelease();
+		playGunner->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
+		this->addChild(playGunner, 2);
+		playGunner->scheduleUpdate();
 	}
 
 	// add zombie1
@@ -87,4 +77,3 @@ bool HelloWorld::init()
 	}
     return true;
 }
-

@@ -1,8 +1,5 @@
 #include "AppDelegate.h"
 #include "HelloWorldScene.h"
-#include "KeyBoardScene.h"
-#include "AppDelegate.h"
-#include "HelloWorldScene.h"
 
 // #define USE_AUDIO_ENGINE 1
 // #define USE_SIMPLE_AUDIO_ENGINE 1
@@ -40,6 +37,10 @@ bool AppDelegate::applicationDidFinishLaunching() {
 		glview = GLViewImpl::createWithRect("zombie", cocos2d::Rect(0, 0, designResolutionSize.width, designResolutionSize.height));
 		director->setOpenGLView(glview);
 	}
+
+	director->setDisplayStats(true);
+
+	director->setAnimationInterval(1.0f / 60);
 
 	// Set the design resolution
 	glview->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, ResolutionPolicy::NO_BORDER);
