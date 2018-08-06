@@ -13,12 +13,9 @@ public:
 	int getHitBoxRadius();
 
 protected:
-	// An attribute of one kind of role. Might change during the game.
-	// The number of pixels the role moved in a second.
 	float speed;
-
-	// A circle hitbox. Might change during the game.
 	int hitBoxRadius;
+	int max_blood;
 
 	//Here velocity represents the real movement of the role. 
 	//Nothing to do with the speed attribute of the role.
@@ -61,13 +58,16 @@ private:
 
 class MainRole : public GunnerBase {
 public:
-	MainRole(float speed_init = mainRoleProperties.speed, int hitBoxRadius_init = mainRoleProperties.hitBoxRadius,
-		     float max_blood_init = mainRoleProperties.max_blood) {
+	MainRole() {
+		speed = mainRoleProperties.speed;
+		hitBoxRadius = mainRoleProperties.hitBoxRadius;
+		max_blood = mainRoleProperties.max_blood;
+
 		auto gunner = new Gunner();
 		gunner->autorelease();
 		gunner->setPosition(Vec2::ZERO);
 		addChild(gunner, 0, "gunner");
-		auto bloodbar = BloodBar::create(max_blood_init);
+		auto bloodbar = BloodBar::create(max_blood);
 		addChild(bloodbar, 0, "bloodBar");
 		bloodbar->setPosition(Vec2(0, this->getChildByName("gunner")->getContentSize().height));
 		bloodbar->scheduleUpdate();
@@ -78,8 +78,6 @@ public:
 		eventListener->onKeyReleased = onKeyReleased;
 		Director::getInstance()->getEventDispatcher()->addEventListenerWithSceneGraphPriority(eventListener, this);
 
-		speed = speed_init;
-		hitBoxRadius = hitBoxRadius_init;
 	}
 
 	void update(float delta) override {
@@ -122,19 +120,20 @@ class NormalZombie : public ZombieBase {
 public:
 
 	// NormalZombies simply move towards the nearest gunner.
-	NormalZombie(float speed_init = normalZombieProperties.speed, int hitBoxRadius_init = normalZombieProperties.hitBoxRadius,
-		float atk_init = normalZombieProperties.atk, int max_blood_init = normalZombieProperties.max_blood) {
+	NormalZombie() {
+		atk = normalZombieProperties.atk;
+		speed = normalZombieProperties.speed;
+		hitBoxRadius = normalZombieProperties.hitBoxRadius;
+		max_blood = normalZombieProperties.max_blood;
+
 		auto zombie = new Zombie();
 		zombie->autorelease();
 		zombie->setPosition(Vec2::ZERO);
 		addChild(zombie, 0, "zombie");
-		auto bloodbar = BloodBar::create(max_blood_init);
+		auto bloodbar = BloodBar::create(max_blood);
 		addChild(bloodbar, 0, "bloodBar");
 		bloodbar->setPosition(Vec2(0, this->getChildByName("zombie")->getContentSize().height));
 
-		atk = atk_init;
-		speed = speed_init;
-		hitBoxRadius = hitBoxRadius_init;
 	}
 
 	void update(float delta) override {

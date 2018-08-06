@@ -4,15 +4,36 @@
 
 USING_NS_CC;
 
-class PropertiesBundle{
+class RoleBaseProp {
 public:
 	float speed;
 	int hitBoxRadius;
-	float atk; // drop atk per second
 	float max_blood;
 };
 
-class normalZombieProp : public PropertiesBundle {
+class GunnerBaseProp : public RoleBaseProp {
+public:
+
+};
+
+class mainRoleProp : public GunnerBaseProp {
+public:
+	mainRoleProp() {
+		speed = 120;
+		hitBoxRadius = 20;
+		max_blood = 100;
+	}
+};
+extern mainRoleProp mainRoleProperties;
+
+
+
+class ZombieBaseProp : public RoleBaseProp {
+public:
+	float atk;
+};
+
+class normalZombieProp : public ZombieBaseProp {
 public:
 	normalZombieProp() {
 		speed = 30;
@@ -23,12 +44,3 @@ public:
 };
 extern normalZombieProp normalZombieProperties;
 
-class mainRoleProp : public PropertiesBundle {
-public:
-	mainRoleProp() {
-		speed = 120;
-		hitBoxRadius = 20;
-		max_blood = 100;
-	}
-};
-extern mainRoleProp mainRoleProperties;
