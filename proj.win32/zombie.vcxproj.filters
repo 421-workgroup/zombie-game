@@ -21,10 +21,13 @@
     <ClCompile Include="..\Classes\HelloWorldScene.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Characters.cpp">
+    <ClCompile Include="..\Classes\Properties.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Properties.cpp">
+    <ClCompile Include="..\Classes\Zombie.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Role.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
