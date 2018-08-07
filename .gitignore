@@ -1,3 +1,13 @@
 cocos2d/*
-proj.*/*
+proj.android
+proj.android-studio
+proj.ios_mac
+proj.linux
+proj.win32/Release.win32
+proj.win32/Debug.win32
+proj.win32/.vs
+proj.win32/Debug
+proj.win32/res
 .vs/*
+/proj.win32/build-cfg.json
+/.vscode
