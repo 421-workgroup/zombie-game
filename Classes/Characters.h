@@ -3,6 +3,7 @@
 #include "cocos2d.h"
 #include "utils.h"
 #include "Properties.h"
+#include "Attack.h"
 
 USING_NS_CC;
 
@@ -10,12 +11,16 @@ USING_NS_CC;
 class RoleBase : public Sprite
 {
 public:
+	enum Direction { RIGHT, UP, LEFT, DOWN };
 	int getHitBoxRadius();
 
 protected:
 	float speed;
 	int hitBoxRadius;
 	int max_blood;
+
+	// Orientation of role, needed when drawing
+	Direction curr_pos;
 
 	//Here velocity represents the real movement of the role. 
 	//Nothing to do with the speed attribute of the role.
@@ -29,6 +34,7 @@ protected:
 	void updatePosition(float delta);
 
 private:
+	
 	Vec2 loc;
 };
 
@@ -49,6 +55,10 @@ public:
 	//std::vector<GunnerBase*> getHitGunnerList();
 
 	int updateBlood(float delta);
+	/*
+	// it listens to network messages from server
+	void update(float delta) override
+	*/
 
 private:
 	static std::vector<GunnerBase*> gunnerList;
@@ -85,10 +95,14 @@ public:
 		updateBlood(delta);
 	}
 
+	void freeze() { _freeze = true; }
+	void unfreeze() { _freeze = false; }
+
+	void accept(AttackBase* attack) { attack->attackRole(this); }
+
 private:
 	bool isPressed[4] = { false, false, false, false };
-	enum { UP, DOWN, LEFT, RIGHT };
-
+	bool _freeze = false;
 	// Change CurrentTarget->velocity when keyboard statu changed.
 	static void onKeyPressed(EventKeyboard::KeyCode keyCode, Event* event);
 	static void onKeyReleased(EventKeyboard::KeyCode keyCode, Event* event);
@@ -104,16 +118,39 @@ public:
 		zombieList.push_back(this);
 	}
 
+	// represent whether the zombie is turning left or right
+	// used when generating animation of turning around.
+	enum SpinningStatus
+	{
+		Still,
+		ClockWise,
+		AntiClockWise
+	};
+
 	static std::vector<ZombieBase*> getZombieList();
 
 	float getATK();
 
+	void accept(AttackBase* attack) { attack->attackEnemy(this); }
+
 protected:
 	float atk;
-	GunnerBase* getNearestGunner(std::vector<GunnerBase*> gunnerList);
+	// the gunner this zombie is chasing at
+	GunnerBase* targetGunner = nullptr;
+	GunnerBase* getTargetGunner(std::vector<GunnerBase*> gunnerList);
+	// Check location of targetGunner and make attacking actions.
+	// It won't take charge of zombie's movement.
+	// Called on every frame.
+	// Must be overrided by different zombie descendants.
+	virtual void checkAttack() = 0;
+	// Calculate the angle position of a specific gunner
+	float calcGunnerAngle(GunnerBase* gunner);
 
 private:
 	static std::vector<ZombieBase*> zombieList;
+	// when changing orientation, mark the final orientation.
+	Direction endPos;
+	
 };
 
 class NormalZombie : public ZombieBase {
@@ -138,30 +175,26 @@ public:
 
 	void update(float delta) override {
 		// Move towards the nearest gunner. 
-		auto nearestGunner = getNearestGunner(GunnerBase::getGunnerList());
+		auto nearestGunner = getTargetGunner(GunnerBase::getGunnerList());
 		velocity.v = speed;
 
-		if (nearestGunner->getPositionX() > getPositionX())
-			velocity.theta = atan((nearestGunner->getPositionY() - getPositionY()) / (nearestGunner->getPositionX() - getPositionX()));
-
-		else if (nearestGunner->getPositionX() < getPositionX())
-			velocity.theta = M_PI + atan((nearestGunner->getPositionY() - getPositionY()) / (nearestGunner->getPositionX() - getPositionX()));
-
-		else if (nearestGunner->getPositionX() == getPositionX()) {
-			if (nearestGunner->getPositionY() == getPositionY()) {
-				velocity.v = 0; velocity.theta = 0;
-			}
-			else if (nearestGunner->getPositionY() > getPositionY())
-				velocity.theta = M_PI_2;
-			else if (nearestGunner->getPositionY() < getPositionY())
-				velocity.theta = -M_PI_2;
-		}
+		velocity.theta = calcGunnerAngle(nearestGunner);
 		updatePosition(delta);
 
 		// TODO: A GunnerBase touched by a NormalZombie will get hurt.
 
 	}
+	void checkAttack() override;
+	// scheduled once with some interval after `checkAttack()` finds gunners to attack.
+	// corresponding to white zombie's bite actions.
+	void biteAttack(float dt);
 
 private:
+	// normal zombie(white)
+	static const float beatRange;
+	// Interval between bite starting time and hit time.
+	// Gunners can escape before hit time.
+	static const float ATTACK_DELAY;
+	bool isReachable(GunnerBase* target);
 
 };
